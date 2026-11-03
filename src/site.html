@@ -1,0 +1,121 @@
+﻿
+            <header class="fixed w-full top-0 z-50 glass-panel">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="brand-lockup">
+                <img src="nallavan-logo-transparent.png" alt="Nallavan Rentals logo" class="brand-logo">
+                <div class="brand-wordmark">
+                    <span class="brand-main">NALLAVAN</span>
+                    <span class="brand-sub">RENTALS</span>
+                </div>
+            </div>
+            <div class="header-actions">
+                <a href="tel:+919003582016" class="header-call" aria-label="Call Nallavan Rentals at +91 90035 82016" title="Call +91 90035 82016">
+                    <i class="fa-solid fa-phone header-call-icon" aria-hidden="true"></i>
+                    <span class="header-call-label">Call</span>
+                </a>
+                <a href="#quick-book" class="bg-gold text-darker font-semibold px-5 py-2 rounded shadow-lg shadow-gold/20 hover:bg-yellow-500 transition">Book Now</a>
+            </div>
+        </div>
+    </header>
+    <section class="hero-section">
+        <div class="container mx-auto px-4 hero-layout">
+            <div class="hero-copy">
+                <p class="hero-kicker">SELF-DRIVE RENTALS · MADURAI</p>
+                <h1 class="hero-title">Nallavan<br><span class="brand-metal-text">Rentals</span></h1>
+                <p class="hero-description">Premium cars for the freedom to explore Madurai at your own pace.</p>
+                <div class="hero-actions">
+                    <a href="#fleet" class="hero-primary">Explore the fleet</a>
+                    <a href="#quick-book" class="hero-secondary">Book a car</a>
+                </div>
+            </div>
+            <div class="hero-media">
+                <img src="/vehicles/hero.jpg" alt="Nallavan Rentals featured rental car" class="hero-sheet-image" fetchpriority="high">
+                <span class="hero-image-caption">Self-drive rentals · Madurai</span>
+            </div>
+        </div>
+    </section>
+    <section id="fleet" class="py-16">
+        <div class="container mx-auto px-4">
+            <h3 class="text-3xl font-bold text-center mb-4 gold-gradient-text">Our Premium Fleet</h3>
+            <p id="fleetStatus" class="hidden" aria-hidden="true"></p>
+            <p id="calStatus" class="hidden" aria-hidden="true"></p>
+            <div id="fleetGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"></div>
+        </div>
+    </section>
+    <section id="quick-book" class="py-16 bg-darker">
+        <div class="container mx-auto px-4 max-w-6xl">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
+                <div class="glass-panel p-8 rounded-lg border-t-4 border-gold h-fit booking-card">
+                    <h3 class="text-2xl font-bold mb-6">Quick Book (WhatsApp)</h3>
+                    <div class="mb-4 flex items-center justify-between rounded border border-gold/30 bg-gold/5 px-3 py-2 text-xs text-silver">
+                        <span><i class="fa-solid fa-bolt text-gold mr-2"></i>Fast response</span>
+                        <a href="https://wa.me/919003582016" target="_blank" rel="noreferrer" class="font-semibold text-gold">WhatsApp us</a>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-silver mb-2">Select Vehicle</label>
+                        <select id="carSelect" onchange="validateDates()" class="w-full bg-dark text-white border border-silver/30 rounded p-3 focus:outline-none focus:border-gold">
+                        </select>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <div><label class="block text-silver mb-2">From Date</label><input type="date" id="fromDate" onchange="validateDates()" class="w-full bg-dark text-white border border-silver/30 rounded p-3 focus:outline-none focus:border-gold"></div>
+                        <div><label class="block text-silver mb-2">From Time</label><input type="time" id="fromTime" value="09:00" onchange="validateDates()" class="w-full bg-dark text-white border border-silver/30 rounded p-3 focus:outline-none focus:border-gold"></div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <div><label class="block text-silver mb-2">To Date</label><input type="date" id="toDate" onchange="validateDates()" class="w-full bg-dark text-white border border-silver/30 rounded p-3 focus:outline-none focus:border-gold"></div>
+                        <div><label class="block text-silver mb-2">To Time</label><input type="time" id="toTime" value="09:00" onchange="validateDates()" class="w-full bg-dark text-white border border-silver/30 rounded p-3 focus:outline-none focus:border-gold"></div>
+                    </div>
+                    <div class="booking-summary flex justify-between items-center mb-6 bg-dark p-4 rounded border border-silver/10">
+                        <div><p class="text-silver text-sm">Total Days</p><p id="displayDays" class="text-xl font-bold">0 Days</p></div>
+                        <div class="text-right"><p class="text-silver text-sm">Estimated Price</p><p id="displayPrice" class="text-2xl font-bold text-gold">₹0</p></div>
+                    </div>
+                    <p id="errorMsg" class="text-red-400 text-sm mb-4 hidden">Please select valid dates.</p>
+                    <div class="quick-book-cta">
+                        <button id="bookBtn" onclick="bookViaWhatsApp()" class="w-full bg-[#25D366] text-white py-4 rounded font-bold text-lg hover:bg-[#128C7E] transition flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"><i class="fa-brands fa-whatsapp text-xl"></i> Book via WhatsApp</button>
+                    </div>
+                </div>
+                <div class="flex flex-col gap-6">
+                    <div class="glass-panel p-6 rounded-lg border-l-4 border-gold">
+                        <h4 class="text-xl font-bold mb-4"><i class="fa-solid fa-folder-open text-gold mr-2"></i>Required Documents</h4>
+                        <ul class="space-y-3 text-silver">
+                            <li class="flex items-start gap-3"><i class="fa-solid fa-id-card text-white mt-1"></i><span><strong>ORIGINAL Driving License</strong> (Mandatory Submission)</span></li>
+                            <li class="flex items-start gap-3"><i class="fa-solid fa-address-card text-white mt-1"></i><span><strong>ORIGINAL Govt Ration Smart Card</strong> (Mandatory Submission)</span></li>
+                            <li class="flex items-start gap-3"><i class="fa-solid fa-fingerprint text-white mt-1"></i><span>Self-Attested Aadhaar Card Copy</span></li>
+                            <li class="flex items-start gap-3"><i class="fa-solid fa-address-card text-white mt-1"></i><span>Government Ration Smart Card Copy</span></li>
+                            <li class="flex items-start gap-3"><i class="fa-solid fa-id-card text-white mt-1"></i><span>Self-Attested Driving License Copy</span></li>
+                            <li class="flex items-start gap-3"><i class="fa-solid fa-motorcycle text-white mt-1"></i><span>Bike RC / Smart Card Copy</span></li>
+                        </ul>
+                    </div>
+                    <div class="glass-panel p-6 rounded-lg border-l-4 border-silver">
+                        <h4 class="text-xl font-bold mb-4"><i class="fa-solid fa-scale-balanced text-silver mr-2"></i>Terms &amp; Conditions</h4>
+                        <ul class="space-y-2 text-sm text-silver/80 list-disc list-inside">
+                            <li><strong>Personal Use:</strong> Vehicle is strictly for family/personal use only.</li>
+                                                        <li><strong>Kilometer Limit:</strong> Includes 360 km per day. Additional usage is charged at ₹12 per km.</li>
+                            <li><strong>Damage &amp; Liability:</strong> Customer bears full financial responsibility for any scratches, repairs, accidents, and third-party damages incurred during the rental period.</li>
+                            <li><strong>Fines &amp; Tolls:</strong> All Police Challans and Fastag toll charges are the sole responsibility of the customer.</li>
+                            <li><strong>Illegal Use:</strong> Vehicle must not be used for racing or any illegal activities.</li>
+                            <li><strong>Security Default:</strong> If the customer fails to cover damage costs or additional fees, Nallavan Rentals holds the legal right to retain the pledged two-wheeler to compensate for the financial loss.</li>
+                            <li><strong>Handover:</strong> Vehicle must be returned in a clean and good condition at the specified time. Left thumb impression and signature are mandatory.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <footer class="bg-dark border-t border-silver/20 py-8">
+        <div class="container mx-auto px-4 text-center">
+            <div class="mb-4 flex flex-col items-center">
+                <div class="brand-lockup flex-col items-center justify-center">
+                    <img src="nallavan-logo-transparent.png" alt="Nallavan Rentals logo" class="brand-logo">
+                    <div class="brand-wordmark items-center text-center">
+                        <span class="brand-main">NALLAVAN</span>
+                        <span class="brand-sub">RENTALS</span>
+                    </div>
+                </div>
+            </div>
+            <p class="text-silver mb-2">nallvancars@gmail.com | +91 90035 82016</p>
+            <p class="text-silver/50 text-sm">© 2026 Nallavan Rentals. All rights reserved.</p>
+        </div>
+    </footer>
+    
+
+
