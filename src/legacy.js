@@ -326,12 +326,17 @@
                 perDay.textContent = '/ day';
                 price.appendChild(perDay);
 
+                const upcomingBookings = document.createElement('p');
+                upcomingBookings.id = `upcoming-${vehicleBadgeId(vehicle)}`;
+                upcomingBookings.className = 'mb-4 min-h-8 text-xs text-silver';
+                upcomingBookings.textContent = 'Loading booked dates…';
+
                 const bookButton = document.createElement('button');
                 bookButton.type = 'button';
                 bookButton.className = 'w-full bg-silver text-dark py-2 rounded font-semibold hover:bg-white transition';
                 bookButton.textContent = 'Book Now';
                 bookButton.addEventListener('click', () => selectCar(vehicle.name));
-                details.append(titleRow, price, bookButton);
+                details.append(titleRow, price, upcomingBookings, bookButton);
                 card.appendChild(details);
                 grid.appendChild(card);
 
@@ -519,14 +524,15 @@
             if (calendarReady && range && range.hasSelection) {
                 const first = formatDate(range.dates[0]);
                 const last = formatDate(range.dates[range.dates.length - 1]);
-                document.getElementById('calStatus').innerText = `Live calendar · Checking ${first}${first === last ? '' : ` to ${last}`} · refreshes every 10 sec`;
+                document.getElementById('calStatus').innerText = `Live calendar synced · Checking ${first}${first === last ? '' : ` to ${last}`} · upcoming booked dates shown below · refreshes every 10 sec`;
             } else if (calendarReady && range) {
-                document.getElementById('calStatus').innerText = 'Live calendar · Upcoming bookings · refreshes every 10 sec';
+                document.getElementById('calStatus').innerText = 'Live calendar synced · Upcoming booked dates shown below · refreshes every 10 sec';
             }
 
             cars.forEach(car => {
                 const badge = document.getElementById(vehicleBadgeId(car));
                 if (!badge) return;
+                const upcomingBookings = document.getElementById(`upcoming-${vehicleBadgeId(car)}`);
                 let text = 'Check calendar';
                 let color = 'bg-yellow-500/20 text-yellow-300 border-yellow-500/30';
 
@@ -555,6 +561,27 @@
 
                 badge.innerText = text;
                 badge.className = `absolute top-3 right-3 z-10 px-2 py-1 rounded text-xs font-bold border ${color}`;
+
+                if (upcomingBookings) {
+                    if (!calendarReady) {
+                        upcomingBookings.innerText = 'Could not load booked dates';
+                    } else {
+                        const dates = getUpcomingBookedDates(car.name);
+                        const fullyBooked = dates.filter(date => getBookedCount(car.name, date) >= car.capacity);
+                        const partiallyBooked = car.capacity > 1 ? dates.filter(date => {
+                            const count = getBookedCount(car.name, date);
+                            return count > 0 && count < car.capacity;
+                        }) : [];
+                        const messages = [];
+                        if (fullyBooked.length) messages.push(`Booked: ${formatDateRange(fullyBooked)}`);
+                        if (partiallyBooked.length) {
+                            const count = getBookedCount(car.name, partiallyBooked[0]);
+                            messages.push(`${count}/${car.capacity} booked: ${formatDateRange(partiallyBooked)}`);
+                        }
+                        upcomingBookings.innerText = messages.length ? messages.join(' · ') : 'No upcoming bookings';
+                    }
+                }
+
             });
         }
 
