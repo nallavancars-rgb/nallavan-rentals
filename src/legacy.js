@@ -328,7 +328,7 @@
 
                 const upcomingBookings = document.createElement('p');
                 upcomingBookings.id = `upcoming-${vehicleBadgeId(vehicle)}`;
-                upcomingBookings.className = 'mb-4 min-h-8 text-xs text-silver';
+                upcomingBookings.className = 'mb-4 min-h-8 text-sm font-semibold text-silver';
                 upcomingBookings.textContent = 'Loading booked dates…';
 
                 const bookButton = document.createElement('button');
@@ -521,14 +521,6 @@
             const range = getSelectedDateRange();
             const cars = fleetVehicles;
 
-            if (calendarReady && range && range.hasSelection) {
-                const first = formatDate(range.dates[0]);
-                const last = formatDate(range.dates[range.dates.length - 1]);
-                document.getElementById('calStatus').innerText = `Live calendar synced · Checking ${first}${first === last ? '' : ` to ${last}`} · upcoming booked dates shown below · refreshes every 10 sec`;
-            } else if (calendarReady && range) {
-                document.getElementById('calStatus').innerText = 'Live calendar synced · Upcoming booked dates shown below · refreshes every 10 sec';
-            }
-
             cars.forEach(car => {
                 const badge = document.getElementById(vehicleBadgeId(car));
                 if (!badge) return;
@@ -554,8 +546,24 @@
                         text = `${bookedCount}/${car.capacity} booked · ${formatDateRange(partialDates)}`;
                         color = 'bg-yellow-500/25 text-yellow-400 border-yellow-500/30';
                     } else {
-                        text = 'Available';
-                        color = 'bg-green-500/20 text-green-400 border-green-500/30';
+                        const upcomingDates = getUpcomingBookedDates(car.name);
+                        const upcomingFullyBooked = upcomingDates.filter(date => getBookedCount(car.name, date) >= car.capacity);
+                        const upcomingPartiallyBooked = car.capacity > 1 ? upcomingDates.filter(date => {
+                            const booked = getBookedCount(car.name, date);
+                            return booked > 0 && booked < car.capacity;
+                        }) : [];
+
+                        if (upcomingFullyBooked.length) {
+                            text = `Next booked · ${formatDateRange(upcomingFullyBooked)}`;
+                            color = 'bg-red-500/20 text-red-400 border-red-500/30';
+                        } else if (upcomingPartiallyBooked.length) {
+                            const bookedCount = getBookedCount(car.name, upcomingPartiallyBooked[0]);
+                            text = `Next · ${formatDateRange(upcomingPartiallyBooked)} · ${bookedCount}/${car.capacity}`;
+                            color = 'bg-yellow-500/25 text-yellow-400 border-yellow-500/30';
+                        } else {
+                            text = 'Available';
+                            color = 'bg-green-500/20 text-green-400 border-green-500/30';
+                        }
                     }
                 }
 
@@ -579,6 +587,9 @@
                             messages.push(`${count}/${car.capacity} booked: ${formatDateRange(partiallyBooked)}`);
                         }
                         upcomingBookings.innerText = messages.length ? messages.join(' · ') : 'No upcoming bookings';
+                        upcomingBookings.className = messages.length
+                            ? 'mb-4 min-h-8 text-sm font-semibold text-amber-300'
+                            : 'mb-4 min-h-8 text-sm text-silver';
                     }
                 }
 
