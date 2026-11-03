@@ -531,7 +531,7 @@
                 if (calendarReady && !range) {
                     text = 'Choose valid dates';
                 } else if (calendarReady) {
-                    const dates = range.hasSelection ? range.dates : getUpcomingBookedDates(car.name);
+                    const dates = range.hasSelection ? range.dates : [];
                     const bookedDates = dates.filter(date => getBookedCount(car.name, date) >= car.capacity);
                     const partialDates = car.capacity > 1 ? dates.filter(date => {
                         const booked = getBookedCount(car.name, date);
@@ -546,24 +546,8 @@
                         text = `${bookedCount}/${car.capacity} booked · ${formatDateRange(partialDates)}`;
                         color = 'bg-yellow-500/25 text-yellow-400 border-yellow-500/30';
                     } else {
-                        const upcomingDates = getUpcomingBookedDates(car.name);
-                        const upcomingFullyBooked = upcomingDates.filter(date => getBookedCount(car.name, date) >= car.capacity);
-                        const upcomingPartiallyBooked = car.capacity > 1 ? upcomingDates.filter(date => {
-                            const booked = getBookedCount(car.name, date);
-                            return booked > 0 && booked < car.capacity;
-                        }) : [];
-
-                        if (upcomingFullyBooked.length) {
-                            text = `Next booked · ${formatDateRange(upcomingFullyBooked)}`;
-                            color = 'bg-red-500/20 text-red-400 border-red-500/30';
-                        } else if (upcomingPartiallyBooked.length) {
-                            const bookedCount = getBookedCount(car.name, upcomingPartiallyBooked[0]);
-                            text = `Next · ${formatDateRange(upcomingPartiallyBooked)} · ${bookedCount}/${car.capacity}`;
-                            color = 'bg-yellow-500/25 text-yellow-400 border-yellow-500/30';
-                        } else {
-                            text = 'Available';
-                            color = 'bg-green-500/20 text-green-400 border-green-500/30';
-                        }
+                        text = 'Available';
+                        color = 'bg-green-500/20 text-green-400 border-green-500/30';
                     }
                 }
 
