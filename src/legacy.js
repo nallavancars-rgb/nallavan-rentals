@@ -27,6 +27,31 @@
             return `${year}-${month}-${day}`;
         }
 
+        function getEarliestPickupTime() {
+            const earliest = new Date();
+            earliest.setSeconds(0, 0);
+            earliest.setMinutes(earliest.getMinutes() + 1);
+            return earliest;
+        }
+
+        function toLocalTimeInputValue(date) {
+            return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+        }
+
+        function syncMinimumPickupTime() {
+            const fromDate = document.getElementById('fromDate');
+            const fromTime = document.getElementById('fromTime');
+            if (!fromDate || !fromTime) return;
+
+            const today = toLocalDateInputValue(new Date());
+            fromDate.min = today;
+            const minimumTime = fromDate.value === today ? toLocalTimeInputValue(getEarliestPickupTime()) : '';
+            fromTime.min = minimumTime;
+            if (minimumTime && fromTime.value && fromTime.value < minimumTime) {
+                fromTime.value = minimumTime;
+            }
+        }
+
         function parseLocalDate(value) {
             if (!value) return null;
             const [year, month, day] = value.split('-').map(Number);
@@ -144,6 +169,11 @@
             toTime.value = `${String(defaultReturn.getHours()).padStart(2, '0')}:${String(defaultReturn.getMinutes()).padStart(2, '0')}`;
             syncMinimumReturnTime();
             validateDates();
+        }
+
+        function handlePickupChange() {
+            syncMinimumPickupTime();
+            setDefaultReturnTime();
         }
 
         async function fetchFleetData() {
@@ -317,15 +347,20 @@
         }
 
         window.onload = function() {
-            const today = toLocalDateInputValue(new Date());
-            document.getElementById('fromDate').setAttribute('min', today);
-            document.getElementById('toDate').setAttribute('min', today);
-            document.getElementById('fromDate').addEventListener('change', setDefaultReturnTime);
-            document.getElementById('fromTime').addEventListener('change', setDefaultReturnTime);
+            const now = new Date();
+            const today = toLocalDateInputValue(now);
+            const earliestPickup = getEarliestPickupTime();
+            document.getElementById('fromDate').min = today;
+            document.getElementById('fromDate').value = today;
+            document.getElementById('fromTime').min = toLocalTimeInputValue(earliestPickup);
+            document.getElementById('fromTime').value = toLocalTimeInputValue(earliestPickup);
+            document.getElementById('toDate').min = today;
+            document.getElementById('fromDate').addEventListener('change', handlePickupChange);
+            document.getElementById('fromTime').addEventListener('change', handlePickupChange);
             const bookBtn = document.getElementById('bookBtn');
             bookBtn.disabled = true;
             bookBtn.classList.add('opacity-50', 'cursor-not-allowed');
-            syncMinimumReturnTime();
+            setDefaultReturnTime();
             renderFleet();
             fetchFleetData();
             window.setInterval(fetchFleetData, 10000);
@@ -531,6 +566,7 @@
         }
 
         function validateDates() {
+            syncMinimumPickupTime();
             syncMinimumReturnTime();
             updateFleetBadges();
             const fromDateStr = document.getElementById('fromDate').value;
@@ -570,6 +606,16 @@
             const toTimeStr = document.getElementById('toTime').value;
             const pickup = new Date(`${fromDateStr}T${fromTimeStr}`);
             const returnTime = new Date(`${toDateStr}T${toTimeStr}`);
+            const earliestPickup = getEarliestPickupTime();
+            if (pickup < earliestPickup) {
+                errorMsg.innerText = 'Pickup date and time cannot be earlier than the current time.';
+                errorMsg.classList.remove('hidden');
+                displayDays.innerText = "0 Days";
+                displayPrice.innerText = "₹0";
+                bookBtn.disabled = true;
+                bookBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                return null;
+            }
             const durationMs = returnTime - pickup;
             const hours = durationMs / (1000 * 60 * 60);
             const fullDays = Math.floor(hours / 24);
